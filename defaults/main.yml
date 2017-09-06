@@ -1,0 +1,10 @@
+---
+# defaults file for wickes.configulator
+
+configulator__template_basedir: ../
+configulator__dest: /tmp/target
+configulator__env_vars: ../env_vars
+configulator__sources:
+  - filebeat_config
+  - sensu_config
+  - wso2_is_config

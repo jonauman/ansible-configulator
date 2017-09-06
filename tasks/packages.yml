@@ -1,0 +1,8 @@
+---
+
+- name: Install envsubst package
+  apt:
+    name: gettext-base
+    state: present
+    update_cache: yes
+

@@ -1,0 +1,8 @@
+---
+# tasks file for wickes.configulator
+
+- name: install packages
+  include: packages.yml
+
+- name: run configulator
+  include: files.yml

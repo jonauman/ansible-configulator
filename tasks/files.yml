@@ -1,0 +1,40 @@
+---
+# tasks file for wickes.configulator
+
+# execute env_vars
+- name: get env_vars
+  shell: cat {{ configulator__env_vars }}/*
+  register: env_vars
+
+- name: create env_vars template
+  template:
+    src: templates/env_vars.j2
+    dest: "{{ configulator__env_vars}}/all_env_vars.txt"
+
+# create subdirs in target
+- name: get files
+  command: find {{ item }} -type f
+  args:
+    chdir: "{{ configulator__template_basedir }}"
+  with_items: "{{ configulator__sources }}"
+  register: var_filepaths
+
+- name: create target dir
+  command: mkdir -p {{ configulator_dest }}/{{ item.1 | dirname }}
+  with_subelements:
+    - "{{var_filepaths.results}}"
+    - stdout_lines
+
+# merge files with env_vars
+- name: create destination file from source
+  shell: set -a;source "{{ configulator__env_vars}}/all_env_vars.txt";cat {{configulator__template_basedir}}{{ item.1 }} | envsubst > {{ configulator__dest }}/{{ item.1 }}
+  with_subelements:
+    - "{{var_filepaths.results}}"
+    - stdout_lines
+
+# move files to destination
+- name: move files to final destination
+  copy:
+    src: "{{ configulator_dest }}/{{ item }}/"
+    dest: /
+  with_items: "{{ configulator__sources }}"
